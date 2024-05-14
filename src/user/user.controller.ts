@@ -12,6 +12,34 @@ export class UserController {
     return this.userService.findAll();
   }
 
+  // Endpoint - user authentication
+  @Post('/auth') // */users/auth
+  async authenticateUser(@Body() body: any, @Res() res: Response) {
+    try {
+      const { username, password } = body;
+
+      // Find user by username
+      const user = await this.userService.findByUsername(username);
+
+      // Checking if user exists
+      if (!user) {
+        return res.status(HttpStatus.UNAUTHORIZED).json({ success: false, error: 'Invalid username or password' })
+      }
+
+      // Checking if password is correct
+      const isPasswordCorrect = await this.userService.validatePassword(password, user.password)
+      if (!isPasswordCorrect) {
+        return res.status(HttpStatus.UNAUTHORIZED).json({ success: false, error: 'Invalid username or password' })
+      }
+
+      // Return success reponse with user ID
+      res.status(HttpStatus.OK).json({ success: true, data: { userId: user._id } })
+    } catch (error) {
+      console.error('Error authenticating user: ', error)
+      res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ error: 'Internal server error' })
+    }
+  }
+
   // Endpoint - registrating user
   @Post('/registration') // */users/registration 
   async registerUser(@Body() body: any, @Res() res: Response) {

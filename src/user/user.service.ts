@@ -20,4 +20,8 @@ export class UserService {
     return this.userModel.find().exec();
   }
 
+  async validatePassword(enteredPassword: string, userPassword: string): Promise<boolean> {
+    return enteredPassword === userPassword;
+  }
+
 }

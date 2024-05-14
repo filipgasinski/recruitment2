@@ -13,6 +13,9 @@ export class User {
 
   @Prop({ required: true, enum: ['basic', 'premium'] })
   userType: string;
+
+  @Prop({ required: true })
+  _id: string;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
