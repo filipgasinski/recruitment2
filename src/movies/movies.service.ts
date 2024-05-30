@@ -26,7 +26,17 @@ export class MoviesService {
     }
 
     private async fetchMovieDetails(title: string): Promise<any> {
-        const omdbResponse = await axios.get('http://www.omdbapi.com/?i=tt3896198&apikey=a5bb452c');
-        return omdbResponse.data;
+      try {
+        const omdbResponse = await axios.get(`http://www.omdbapi.com/?t=${encodeURIComponent(title)}&apikey=a5bb452c`);
+        if (omdbResponse.status === 200 && omdbResponse.data.Response !== 'False') {
+          return omdbResponse.data;
+        } else {
+          // if status isnt 200 or api response is false
+          throw new Error(omdbResponse.data.Error || 'Error fetching movie details');
+        }
+      } catch (error) {
+        console.error(`Failed to fetch movie details for title: ${title}`, error);
+        throw new Error(`Failed to fetch movie details: ${error.message}`);
       }
+    }
 }
