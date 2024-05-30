@@ -3,6 +3,9 @@ import { InjectModel } from "@nestjs/mongoose"
 import { Model } from 'mongoose'
 import { Movie, MovieDocument } from './movies.model'
 import axios from 'axios'
+import * as dotenv from 'dotenv'
+
+dotenv.config()
 
 @Injectable()
 export class MoviesService {
@@ -27,14 +30,20 @@ export class MoviesService {
 
     private async fetchMovieDetails(title: string): Promise<any> {
       try {
-        const omdbResponse = await axios.get(`http://www.omdbapi.com/?t=${encodeURIComponent(title)}&apikey=a5bb452c`);
+        const apiKey = process.env.OMDB_API_KEY
+        if (!apiKey) {
+          throw new Error('API KEY is not defined')
+        }
+
+        const omdbResponse = await axios.get(`http://www.omdbapi.com/?t=${encodeURIComponent(title)}&apikey=${apiKey}`);
         if (omdbResponse.status === 200 && omdbResponse.data.Response !== 'False') {
           return omdbResponse.data;
         } else {
-          // if status isnt 200 or api response is false
+          // if status isnt 200 or api response is false - means there is nothing to fetch
           throw new Error(omdbResponse.data.Error || 'Error fetching movie details');
         }
       } catch (error) {
+        // error handling
         console.error(`Failed to fetch movie details for title: ${title}`, error);
         throw new Error(`Failed to fetch movie details: ${error.message}`);
       }
