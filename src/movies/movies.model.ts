@@ -5,6 +5,9 @@ export type MovieDocument = Movie & Document
 
 @Schema()
 export class Movie {
+    save(save: any) {
+        throw new Error('Method not implemented.')
+    }
     @Prop()
     title: string
 
